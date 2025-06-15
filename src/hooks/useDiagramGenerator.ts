@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from 'react';
 import mermaid from 'mermaid';
 import { AuthFlow } from '@/types/auth';
@@ -10,104 +11,33 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
     if (!isInitialized.current) {
       mermaid.initialize({
         startOnLoad: true,
-        theme: actualTheme === 'dark' ? 'dark' : 'default',
-        themeVariables: actualTheme === 'dark' ? {
-          // Primary colors
-          primaryColor: '#3B82F6',
-          primaryTextColor: '#FFFFFF',
-          primaryBorderColor: '#1D4ED8',
-          lineColor: '#60A5FA',
-          secondaryColor: '#1F2937',
-          tertiaryColor: '#111827',
-          
-          // Background colors
-          background: '#0F172A',
-          mainBkg: '#1E293B',
-          secondBkg: '#334155',
-          
-          // Text colors - all white for maximum contrast
-          textColor: '#FFFFFF',
-          
-          // Actor styling
-          actorBkg: '#1E293B',
-          actorBorder: '#475569',
-          actorTextColor: '#FFFFFF',
-          actorLineColor: '#60A5FA',
-          
-          // Message styling
-          messageLine0: '#60A5FA',
-          messageLine1: '#60A5FA',
-          messageText: '#FFFFFF',
-          
-          // Note styling
-          noteBkgColor: '#FEF3C7',
-          noteTextColor: '#92400E',
-          noteBorderColor: '#F59E0B',
-          
-          // Sequence diagram elements
-          sequenceNumberColor: '#FFFFFF',
-          activationBorderColor: '#60A5FA',
-          activationBkgColor: '#1E293B',
-          
-          // Loop and alt styling
-          labelBoxBkgColor: '#1E293B',
-          labelBoxBorderColor: '#475569',
-          labelTextColor: '#FFFFFF',
-          loopTextColor: '#FFFFFF',
-          
-          // Arrow styling
-          arrowheadColor: '#60A5FA',
-          
-          // Class diagram colors
-          classText: '#FFFFFF',
-          
-          // Flowchart colors
-          nodeBkg: '#1E293B',
-          nodeBorder: '#475569',
-          clusterBkg: '#0F172A',
-          clusterBorder: '#334155',
-          defaultLinkColor: '#60A5FA',
-          titleColor: '#FFFFFF',
-          
-          // Additional elements
-          edgeLabelBackground: '#1E293B',
-          
-          // Grid and section colors
-          gridColor: '#334155',
-          section0: '#1E293B',
-          section1: '#0F172A',
-          section2: '#1E293B',
-          section3: '#0F172A',
-          
-          // Alternative and optional colors
-          altTextColor: '#FFFFFF',
-          optTextColor: '#FFFFFF'
-        } : {
-          // Light theme
-          primaryColor: '#2563EB',
+        theme: 'default',
+        themeVariables: {
+          // Primary colors - lighter blues for better text contrast
+          primaryColor: '#E0F2FE',
           primaryTextColor: '#1F2937',
-          primaryBorderColor: '#1D4ED8',
-          lineColor: '#3B82F6',
-          secondaryColor: '#F1F5F9',
+          primaryBorderColor: '#0EA5E9',
+          lineColor: '#0EA5E9',
+          secondaryColor: '#F8FAFC',
           tertiaryColor: '#FFFFFF',
           
           // Background colors
           background: '#FFFFFF',
-          mainBkg: '#F8FAFC',
-          secondBkg: '#F1F5F9',
+          mainBkg: '#FFFFFF',
+          secondBkg: '#F8FAFC',
           
           // Text colors
           textColor: '#1F2937',
           
-          // Actor styling
-          actorBkg: '#F8FAFC',
-          actorBorder: '#CBD5E1',
+          // Actor styling - light background with dark text
+          actorBkg: '#F1F5F9',
+          actorBorder: '#94A3B8',
           actorTextColor: '#1F2937',
-          actorLineColor: '#3B82F6',
+          actorLineColor: '#0EA5E9',
           
           // Message styling
-          messageLine0: '#3B82F6',
-          messageLine1: '#3B82F6',
+          messageLine0: '#0EA5E9',
+          messageLine1: '#0EA5E9',
           messageText: '#1F2937',
           
           // Note styling
@@ -117,27 +47,27 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
           
           // Sequence diagram elements
           sequenceNumberColor: '#1F2937',
-          activationBorderColor: '#3B82F6',
-          activationBkgColor: '#EFF6FF',
+          activationBorderColor: '#0EA5E9',
+          activationBkgColor: '#F0F9FF',
           
           // Loop and alt styling
-          labelBoxBkgColor: '#F1F5F9',
+          labelBoxBkgColor: '#F8FAFC',
           labelBoxBorderColor: '#CBD5E1',
           labelTextColor: '#1F2937',
           loopTextColor: '#1F2937',
           
           // Arrow styling
-          arrowheadColor: '#3B82F6',
+          arrowheadColor: '#0EA5E9',
           
           // Class diagram colors
           classText: '#1F2937',
           
-          // Flowchart colors
+          // Flowchart colors - very light backgrounds
           nodeBkg: '#F8FAFC',
           nodeBorder: '#CBD5E1',
           clusterBkg: '#FFFFFF',
           clusterBorder: '#E2E8F0',
-          defaultLinkColor: '#3B82F6',
+          defaultLinkColor: '#0EA5E9',
           titleColor: '#1F2937',
           
           // Additional elements
