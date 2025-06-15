@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react';
 import mermaid from 'mermaid';
 import { AuthFlow } from '@/types/auth';
@@ -13,7 +12,7 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
         startOnLoad: true,
         theme: actualTheme === 'dark' ? 'dark' : 'default',
         themeVariables: actualTheme === 'dark' ? {
-          // Primary colors with better contrast
+          // Primary colors
           primaryColor: '#3B82F6',
           primaryTextColor: '#FFFFFF',
           primaryBorderColor: '#1D4ED8',
@@ -26,7 +25,7 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
           mainBkg: '#1E293B',
           secondBkg: '#334155',
           
-          // Universal text color - white for maximum contrast
+          // Text colors - all white for maximum contrast
           textColor: '#FFFFFF',
           
           // Actor styling
@@ -40,10 +39,10 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
           messageLine1: '#60A5FA',
           messageText: '#FFFFFF',
           
-          // Note styling with high contrast
+          // Note styling
           noteBkgColor: '#FEF3C7',
           noteTextColor: '#92400E',
-          noteLabelColor: '#92400E',
+          noteBorderColor: '#F59E0B',
           
           // Sequence diagram elements
           sequenceNumberColor: '#FFFFFF',
@@ -70,7 +69,7 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
           defaultLinkColor: '#60A5FA',
           titleColor: '#FFFFFF',
           
-          // Additional text elements
+          // Additional elements
           edgeLabelBackground: '#1E293B',
           
           // Grid and section colors
@@ -84,7 +83,7 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
           altTextColor: '#FFFFFF',
           optTextColor: '#FFFFFF'
         } : {
-          // Light theme with improved contrast
+          // Light theme
           primaryColor: '#2563EB',
           primaryTextColor: '#1F2937',
           primaryBorderColor: '#1D4ED8',
@@ -114,7 +113,7 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
           // Note styling
           noteBkgColor: '#FEF3C7',
           noteTextColor: '#92400E',
-          noteLabelColor: '#92400E',
+          noteBorderColor: '#F59E0B',
           
           // Sequence diagram elements
           sequenceNumberColor: '#1F2937',
