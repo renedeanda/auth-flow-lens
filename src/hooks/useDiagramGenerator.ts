@@ -11,7 +11,7 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
     if (!isInitialized.current) {
       mermaid.initialize({
         startOnLoad: true,
-        theme: actualTheme === 'dark' ? 'dark' : 'base',
+        theme: actualTheme === 'dark' ? 'neutral' : 'base',
         themeVariables: actualTheme === 'dark' ? {
           primaryColor: '#60A5FA',
           primaryTextColor: '#FFFFFF',
@@ -22,12 +22,16 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
           background: '#111827',
           mainBkg: '#374151',
           secondBkg: '#4B5563',
-          // High contrast text colors for better readability
+          // Comprehensive white text for all elements
           textColor: '#FFFFFF',
           actorTextColor: '#FFFFFF',
           labelTextColor: '#FFFFFF',
           loopTextColor: '#FFFFFF',
           activationTextColor: '#FFFFFF',
+          c0: '#FFFFFF', // Class text color
+          c1: '#FFFFFF', // Class text color
+          c2: '#FFFFFF', // Class text color  
+          c3: '#FFFFFF', // Class text color
           // Note styling with high contrast
           noteBkgColor: '#FEF3C7',
           noteTextColor: '#92400E',
@@ -36,14 +40,23 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
           actorBkg: '#4B5563',
           actorBorder: '#9CA3AF',
           actorLineColor: '#A78BFA',
-          // Message text styling
+          // Message and arrow styling
           messageLine0: '#FFFFFF',
           messageLine1: '#FFFFFF',
           messageText: '#FFFFFF',
-          // Arrow colors
           arrowheadColor: '#A78BFA',
           // Sequence diagram specific
-          sequenceNumberColor: '#FFFFFF'
+          sequenceNumberColor: '#FFFFFF',
+          // Additional text elements
+          altTextColor: '#FFFFFF',
+          optTextColor: '#FFFFFF',
+          edgeLabelBackground: '#374151',
+          // Flowchart specific
+          nodeBkg: '#4B5563',
+          nodeBorder: '#9CA3AF',
+          clusterBkg: '#374151',
+          clusterBorder: '#6B7280',
+          defaultLinkColor: '#A78BFA'
         } : {
           primaryColor: '#3B82F6',
           primaryTextColor: '#1F2937',
