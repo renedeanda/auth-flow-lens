@@ -17,7 +17,13 @@ const PopularityBadge = ({ category, value }: { category: keyof typeof stackPopu
   const categoryData = stackPopularity[category] as Record<string, any>;
   const popularity = categoryData[value];
   
-  if (!popularity) return null;
+  if (!popularity) {
+    return (
+      <div className="flex items-center gap-1 text-xs">
+        <span className="text-gray-500 text-xs">New</span>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center gap-1 text-xs">
@@ -43,7 +49,7 @@ export const StackSelector: React.FC<StackSelectorProps> = ({ authFlow, setAuthF
             Choose Your Stack
             <div className="flex items-center gap-1 text-xs bg-muted/50 px-2 py-1 rounded-full">
               <TrendingUp className="w-3 h-3" />
-              <span>Popularity shown</span>
+              <span>Usage rates</span>
             </div>
           </div>
         </CardTitle>
