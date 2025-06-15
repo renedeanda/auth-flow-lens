@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -15,32 +14,69 @@ const getSecurityIssues = (authFlow: AuthFlow) => {
   if (authFlow.authProvider === 'Custom JWT') {
     issues.push({
       type: 'warning',
-      title: 'JWT Security Risks',
-      description: 'Ensure JWT secrets are strong, tokens have expiration, and implement proper key rotation.',
-      details: 'Common issues: weak secrets, no expiration, storing sensitive data in JWT payload',
-      learnMoreUrl: 'https://auth0.com/blog/a-look-at-the-latest-draft-for-jwt-bcp/'
+      title: 'JWT Security & Refresh Tokens',
+      description: 'JWTs should be short-lived (15-60 minutes) with longer-lived refresh tokens for security.',
+      details: 'Many developers skip refresh tokens, but they\'re crucial for security and user experience',
+      learnMoreUrl: 'https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them/'
+    });
+    
+    issues.push({
+      type: 'info',
+      title: 'Token Storage Trade-offs',
+      description: 'httpOnly cookies prevent XSS but are vulnerable to CSRF. localStorage prevents CSRF but vulnerable to XSS.',
+      details: 'Choice depends on your app\'s threat model: Size limits, convenience, and attack vectors differ',
+      learnMoreUrl: 'https://auth0.com/docs/secure/security-guidance/data-security/token-storage'
     });
   }
   
   if (authFlow.authProvider === 'Passport.js') {
     issues.push({
       type: 'warning',
-      title: 'Session Security',
-      description: 'Configure secure session storage and implement CSRF protection.',
-      details: 'Risks: session hijacking, CSRF attacks, insecure session storage',
+      title: 'Missing Refresh Token Implementation',
+      description: 'Many Passport.js implementations skip refresh tokens, requiring full re-authentication when sessions expire.',
+      details: 'Consider implementing refresh tokens even with session-based auth for better UX',
+      learnMoreUrl: 'https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html'
+    });
+    
+    issues.push({
+      type: 'warning',
+      title: 'Session vs Token Trade-offs',
+      description: 'Sessions with httpOnly cookies prevent XSS but need CSRF protection. Consider hybrid approaches.',
+      details: 'Sessions are vulnerable to CSRF, tokens to XSS - understand your threat model',
       learnMoreUrl: 'https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html'
     });
   }
   
-  if (authFlow.frontend === 'React' || authFlow.frontend === 'Vue.js') {
+  // Add OAuth-specific guidance for providers that use it
+  if (['Auth0', 'Google Identity', 'Azure AD', 'Okta', 'NextAuth.js'].includes(authFlow.authProvider)) {
     issues.push({
       type: 'info',
-      title: 'XSS Prevention',
-      description: 'Sanitize user inputs and avoid storing sensitive tokens in localStorage.',
-      details: 'Best practice: Use httpOnly cookies for sensitive tokens when possible',
-      learnMoreUrl: 'https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html'
+      title: 'OAuth Flow Complexity',
+      description: 'OAuth involves 3rd parties, adding redirect complexity and potential attack vectors like state parameter tampering.',
+      details: 'Always validate state parameter, use PKCE for SPAs, and handle callback errors gracefully',
+      learnMoreUrl: 'https://datatracker.ietf.org/doc/html/rfc6749#section-10'
     });
   }
+  
+  // Enhanced token storage guidance
+  if (authFlow.frontend === 'React' || authFlow.frontend === 'Vue.js' || authFlow.frontend === 'Next.js') {
+    issues.push({
+      type: 'info',
+      title: 'Token Storage Strategy',
+      description: 'Storage choice depends on your threat model: httpOnly cookies (CSRF risk) vs localStorage (XSS risk) vs memory (UX impact).',
+      details: 'Consider: token size limits, domain sharing needs, mobile app support, and refresh token patterns',
+      learnMoreUrl: 'https://auth0.com/docs/secure/security-guidance/data-security/token-storage'
+    });
+  }
+  
+  // Universal refresh token guidance
+  issues.push({
+    type: 'warning',
+    title: 'Short-lived Access Tokens',
+    description: 'Access tokens should expire in 15-60 minutes. Use refresh tokens for longer sessions without re-authentication.',
+    details: 'Many developers use long-lived tokens for convenience, but this increases security risk significantly',
+    learnMoreUrl: 'https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them/'
+  });
   
   if (authFlow.authProvider === 'Auth0') {
     issues.push({
