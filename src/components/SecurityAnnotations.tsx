@@ -101,6 +101,87 @@ const getSecurityIssues = (authFlow: AuthFlow) => {
       learnMoreUrl: 'https://next-auth.js.org/configuration/options#session'
     });
   }
+
+  // Add missing auth providers
+  if (authFlow.authProvider === 'Okta') {
+    issues.push({
+      type: 'info',
+      title: 'Token Validation',
+      description: 'Always validate Okta JWT tokens and implement proper scopes.',
+      details: 'Verify JWT signature using Okta public keys and validate claims',
+      learnMoreUrl: 'https://developer.okta.com/docs/guides/validate-access-tokens/go/main/'
+    });
+  }
+
+  if (authFlow.authProvider === 'Azure AD') {
+    issues.push({
+      type: 'info',
+      title: 'Token Validation',
+      description: 'Validate Azure AD tokens and implement proper API permissions.',
+      details: 'Use Microsoft Graph API securely and validate JWT signatures',
+      learnMoreUrl: 'https://docs.microsoft.com/en-us/azure/active-directory/develop/access-tokens'
+    });
+  }
+
+  if (authFlow.authProvider === 'Google Identity') {
+    issues.push({
+      type: 'info',
+      title: 'Token Validation',
+      description: 'Verify Google ID tokens and implement proper OAuth 2.0 scopes.',
+      details: 'Always validate Google JWT tokens server-side',
+      learnMoreUrl: 'https://developers.google.com/identity/protocols/oauth2/openid-connect#validatinganidtoken'
+    });
+  }
+
+  if (authFlow.authProvider === 'Magic') {
+    issues.push({
+      type: 'info',
+      title: 'Token Security',
+      description: 'Implement proper token validation and secure Magic Link handling.',
+      details: 'Magic uses cryptographic proofs - ensure proper validation',
+      learnMoreUrl: 'https://magic.link/docs/auth/api-reference/server-side-sdks/node#token-validation'
+    });
+  }
+
+  if (authFlow.authProvider === 'Stytch') {
+    issues.push({
+      type: 'info',
+      title: 'Session Security',
+      description: 'Implement proper Stytch session validation and token refresh.',
+      details: 'Use Stytch backend SDKs for secure token validation',
+      learnMoreUrl: 'https://stytch.com/docs/guides/sessions/using-sessions'
+    });
+  }
+
+  if (authFlow.authProvider === 'WorkOS') {
+    issues.push({
+      type: 'info',
+      title: 'SSO Security',
+      description: 'Implement proper SAML/OIDC validation and organization isolation.',
+      details: 'WorkOS handles enterprise SSO - ensure proper user isolation',
+      learnMoreUrl: 'https://workos.com/docs/sso/guide/introduction'
+    });
+  }
+
+  if (authFlow.authProvider === 'Keycloak') {
+    issues.push({
+      type: 'info',
+      title: 'Token Validation',
+      description: 'Configure proper realm isolation and validate Keycloak JWT tokens.',
+      details: 'Use Keycloak adapters or validate JWTs using realm public keys',
+      learnMoreUrl: 'https://www.keycloak.org/docs/latest/securing_apps/index.html#_token-verification'
+    });
+  }
+
+  if (authFlow.authProvider === 'FusionAuth') {
+    issues.push({
+      type: 'info',
+      title: 'JWT Security',
+      description: 'Implement proper FusionAuth JWT validation and refresh token handling.',
+      details: 'Use FusionAuth client libraries for secure token management',
+      learnMoreUrl: 'https://fusionauth.io/docs/v1/tech/apis/jwt#verify-a-jwt'
+    });
+  }
   
   // Universal security reminders
   issues.push({
@@ -109,6 +190,26 @@ const getSecurityIssues = (authFlow: AuthFlow) => {
     description: 'Always use HTTPS in production to prevent token interception.',
     details: 'Tokens sent over HTTP can be easily intercepted',
     learnMoreUrl: 'https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Protection_Cheat_Sheet.html'
+  });
+
+  // Add CSRF protection reminder for session-based auth
+  if (authFlow.authProvider === 'Passport.js' || authFlow.authProvider === 'NextAuth.js') {
+    issues.push({
+      type: 'warning',
+      title: 'CSRF Protection',
+      description: 'Implement CSRF tokens to prevent cross-site request forgery attacks.',
+      details: 'Session-based auth is vulnerable to CSRF - use proper tokens',
+      learnMoreUrl: 'https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html'
+    });
+  }
+
+  // Add rate limiting reminder
+  issues.push({
+    type: 'info',
+    title: 'Rate Limiting',
+    description: 'Implement rate limiting on authentication endpoints to prevent brute force attacks.',
+    details: 'Protect login endpoints with exponential backoff and account lockout',
+    learnMoreUrl: 'https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html#account-lockout'
   });
   
   return issues;
