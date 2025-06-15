@@ -14,14 +14,28 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
         theme: actualTheme === 'dark' ? 'dark' : 'base',
         themeVariables: actualTheme === 'dark' ? {
           primaryColor: '#3B82F6',
-          primaryTextColor: '#F8FAFC',
+          primaryTextColor: '#F1F5F9',
           primaryBorderColor: '#2563EB',
-          lineColor: '#6366F1',
+          lineColor: '#8B5CF6',
           secondaryColor: '#1E293B',
           tertiaryColor: '#0F172A',
           background: '#0F172A',
           mainBkg: '#1E293B',
-          secondBkg: '#334155'
+          secondBkg: '#334155',
+          // Improved text colors for better contrast
+          textColor: '#F1F5F9',
+          actorTextColor: '#F1F5F9',
+          labelTextColor: '#F1F5F9',
+          loopTextColor: '#F1F5F9',
+          noteTextColor: '#F1F5F9',
+          activationTextColor: '#F1F5F9',
+          // Note backgrounds for better readability
+          noteBkgColor: '#FCD34D',
+          noteTextColor: '#1F2937',
+          // Actor colors
+          actorBkg: '#1E293B',
+          actorBorder: '#475569',
+          actorLineColor: '#8B5CF6'
         } : {
           primaryColor: '#3B82F6',
           primaryTextColor: '#1F2937',
@@ -33,6 +47,19 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
         flowchart: {
           useMaxWidth: true,
           htmlLabels: true
+        },
+        sequence: {
+          useMaxWidth: true,
+          // Improved spacing and sizing for better readability
+          diagramMarginX: 50,
+          diagramMarginY: 10,
+          actorMargin: 50,
+          width: 150,
+          height: 65,
+          boxMargin: 10,
+          boxTextMargin: 5,
+          noteMargin: 10,
+          messageMargin: 35
         }
       });
       isInitialized.current = true;
