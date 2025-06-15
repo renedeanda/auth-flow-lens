@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react';
 import mermaid from 'mermaid';
 import { AuthFlow } from '@/types/auth';
@@ -13,25 +12,25 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
         startOnLoad: true,
         theme: 'default',
         themeVariables: {
-          // Primary colors - lighter blues for better text contrast
-          primaryColor: '#E0F2FE',
+          // Primary colors - sky blue for main boxes
+          primaryColor: '#87CEEB',
           primaryTextColor: '#1F2937',
           primaryBorderColor: '#0EA5E9',
           lineColor: '#0EA5E9',
-          secondaryColor: '#F8FAFC',
+          secondaryColor: '#FFFFFF',
           tertiaryColor: '#FFFFFF',
           
-          // Background colors
+          // Background colors - white
           background: '#FFFFFF',
           mainBkg: '#FFFFFF',
-          secondBkg: '#F8FAFC',
+          secondBkg: '#FFFFFF',
           
           // Text colors
           textColor: '#1F2937',
           
-          // Actor styling - light background with dark text
-          actorBkg: '#F1F5F9',
-          actorBorder: '#94A3B8',
+          // Actor styling - sky blue background with dark text
+          actorBkg: '#87CEEB',
+          actorBorder: '#0EA5E9',
           actorTextColor: '#1F2937',
           actorLineColor: '#0EA5E9',
           
@@ -40,7 +39,7 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
           messageLine1: '#0EA5E9',
           messageText: '#1F2937',
           
-          // Note styling
+          // Note styling - keep yellow
           noteBkgColor: '#FEF3C7',
           noteTextColor: '#92400E',
           noteBorderColor: '#F59E0B',
@@ -51,7 +50,7 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
           activationBkgColor: '#F0F9FF',
           
           // Loop and alt styling
-          labelBoxBkgColor: '#F8FAFC',
+          labelBoxBkgColor: '#FFFFFF',
           labelBoxBorderColor: '#CBD5E1',
           labelTextColor: '#1F2937',
           loopTextColor: '#1F2937',
@@ -62,8 +61,8 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
           // Class diagram colors
           classText: '#1F2937',
           
-          // Flowchart colors - very light backgrounds
-          nodeBkg: '#F8FAFC',
+          // Flowchart colors - white backgrounds
+          nodeBkg: '#FFFFFF',
           nodeBorder: '#CBD5E1',
           clusterBkg: '#FFFFFF',
           clusterBorder: '#E2E8F0',
@@ -75,9 +74,9 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
           
           // Grid and section colors
           gridColor: '#E2E8F0',
-          section0: '#F8FAFC',
+          section0: '#FFFFFF',
           section1: '#FFFFFF',
-          section2: '#F8FAFC',
+          section2: '#FFFFFF',
           section3: '#FFFFFF',
           
           // Alternative and optional colors
@@ -90,7 +89,6 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
           curve: 'basis'
         },
         sequence: {
-          useMaxWidth: true,
           diagramMarginX: 50,
           diagramMarginY: 20,
           actorMargin: 50,
