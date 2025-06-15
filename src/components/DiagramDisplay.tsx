@@ -5,6 +5,7 @@ import { Sparkles } from 'lucide-react';
 import { AuthFlow } from '@/types/auth';
 import { DiagramControls } from './DiagramControls';
 import { SecurityAnnotations } from './SecurityAnnotations';
+import { CommonPitfalls } from './CommonPitfalls';
 
 interface DiagramDisplayProps {
   authFlow: AuthFlow;
@@ -37,6 +38,7 @@ export const DiagramDisplay: React.FC<DiagramDisplayProps> = ({ authFlow }) => {
       
       <Card className="bg-card/80 backdrop-blur-sm border-border/60 shadow-xl">
         <CardContent className="p-6">
+          <CommonPitfalls authFlow={authFlow} />
           <SecurityAnnotations authFlow={authFlow} />
         </CardContent>
       </Card>

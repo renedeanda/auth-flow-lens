@@ -2,15 +2,33 @@
 import React from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Zap, Shield, Palette, Code2 } from 'lucide-react';
+import { Zap, Shield, Palette, Code2, TrendingUp } from 'lucide-react';
 import { AuthFlow } from '@/types/auth';
 import { frontendOptions, authProviderOptions, backendOptions } from '@/data/stackOptions';
 import { StackBadges } from './StackBadges';
+import { stackPopularity, getPopularityColor, getTrendIcon } from '@/data/stackPopularity';
 
 interface StackSelectorProps {
   authFlow: AuthFlow;
   setAuthFlow: React.Dispatch<React.SetStateAction<AuthFlow>>;
 }
+
+const PopularityBadge = ({ category, value }: { category: keyof typeof stackPopularity, value: string }) => {
+  const popularity = stackPopularity[category][value as keyof typeof stackPopularity[typeof category]];
+  
+  if (!popularity) return null;
+
+  return (
+    <div className="flex items-center gap-1 text-xs">
+      <span className={getPopularityColor(popularity.popularity)}>
+        {popularity.percentage}%
+      </span>
+      <span className="text-xs">
+        {getTrendIcon(popularity.trend)}
+      </span>
+    </div>
+  );
+};
 
 export const StackSelector: React.FC<StackSelectorProps> = ({ authFlow, setAuthFlow }) => {
   return (
@@ -20,7 +38,13 @@ export const StackSelector: React.FC<StackSelectorProps> = ({ authFlow, setAuthF
           <div className="p-2 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg group-hover:scale-110 transition-transform">
             <Code2 className="w-5 h-5 text-white" />
           </div>
-          Choose Your Stack
+          <div className="flex items-center gap-2">
+            Choose Your Stack
+            <div className="flex items-center gap-1 text-xs bg-muted/50 px-2 py-1 rounded-full">
+              <TrendingUp className="w-3 h-3" />
+              <span>Popularity shown</span>
+            </div>
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -39,7 +63,10 @@ export const StackSelector: React.FC<StackSelectorProps> = ({ authFlow, setAuthF
             <SelectContent>
               {frontendOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
-                  {option.label}
+                  <div className="flex items-center justify-between w-full">
+                    <span>{option.label}</span>
+                    <PopularityBadge category="frontend" value={option.value} />
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
@@ -61,7 +88,10 @@ export const StackSelector: React.FC<StackSelectorProps> = ({ authFlow, setAuthF
             <SelectContent>
               {authProviderOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
-                  {option.label}
+                  <div className="flex items-center justify-between w-full">
+                    <span>{option.label}</span>
+                    <PopularityBadge category="authProvider" value={option.value} />
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
@@ -83,7 +113,10 @@ export const StackSelector: React.FC<StackSelectorProps> = ({ authFlow, setAuthF
             <SelectContent>
               {backendOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
-                  {option.label}
+                  <div className="flex items-center justify-between w-full">
+                    <span>{option.label}</span>
+                    <PopularityBadge category="backend" value={option.value} />
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
