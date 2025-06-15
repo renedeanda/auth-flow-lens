@@ -102,7 +102,6 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
           messageMargin: 35,
           mirrorActors: true,
           bottomMarginAdj: 1,
-          useMaxWidth: true,
           rightAngles: false,
           showSequenceNumbers: false
         }
