@@ -2,7 +2,7 @@
 import React from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Shield, AlertTriangle, Info } from 'lucide-react';
+import { Shield, AlertTriangle, Info, ExternalLink } from 'lucide-react';
 import { AuthFlow } from '@/types/auth';
 
 interface SecurityAnnotationsProps {
@@ -17,7 +17,8 @@ const getSecurityIssues = (authFlow: AuthFlow) => {
       type: 'warning',
       title: 'JWT Security Risks',
       description: 'Ensure JWT secrets are strong, tokens have expiration, and implement proper key rotation.',
-      details: 'Common issues: weak secrets, no expiration, storing sensitive data in JWT payload'
+      details: 'Common issues: weak secrets, no expiration, storing sensitive data in JWT payload',
+      learnMoreUrl: 'https://auth0.com/blog/a-look-at-the-latest-draft-for-jwt-bcp/'
     });
   }
   
@@ -26,7 +27,8 @@ const getSecurityIssues = (authFlow: AuthFlow) => {
       type: 'warning',
       title: 'Session Security',
       description: 'Configure secure session storage and implement CSRF protection.',
-      details: 'Risks: session hijacking, CSRF attacks, insecure session storage'
+      details: 'Risks: session hijacking, CSRF attacks, insecure session storage',
+      learnMoreUrl: 'https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html'
     });
   }
   
@@ -35,16 +37,68 @@ const getSecurityIssues = (authFlow: AuthFlow) => {
       type: 'info',
       title: 'XSS Prevention',
       description: 'Sanitize user inputs and avoid storing sensitive tokens in localStorage.',
-      details: 'Best practice: Use httpOnly cookies for sensitive tokens when possible'
+      details: 'Best practice: Use httpOnly cookies for sensitive tokens when possible',
+      learnMoreUrl: 'https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html'
     });
   }
   
-  if (authFlow.authProvider === 'Auth0' || authFlow.authProvider === 'Firebase Auth') {
+  if (authFlow.authProvider === 'Auth0') {
     issues.push({
       type: 'info',
       title: 'Token Validation',
       description: 'Always validate tokens on the backend, never trust frontend-only validation.',
-      details: 'Critical: Backend must verify token signature and expiration'
+      details: 'Critical: Backend must verify token signature and expiration',
+      learnMoreUrl: 'https://auth0.com/docs/secure/tokens/access-tokens/validate-access-tokens'
+    });
+  }
+  
+  if (authFlow.authProvider === 'Firebase Auth') {
+    issues.push({
+      type: 'info',
+      title: 'Token Validation',
+      description: 'Always validate tokens on the backend, never trust frontend-only validation.',
+      details: 'Critical: Backend must verify token signature and expiration',
+      learnMoreUrl: 'https://firebase.google.com/docs/auth/admin/verify-id-tokens'
+    });
+  }
+  
+  if (authFlow.authProvider === 'Clerk') {
+    issues.push({
+      type: 'info',
+      title: 'Token Validation',
+      description: 'Always validate tokens on the backend, never trust frontend-only validation.',
+      details: 'Critical: Backend must verify token signature and expiration',
+      learnMoreUrl: 'https://clerk.com/docs/backend-requests/handling/manual-jwt'
+    });
+  }
+  
+  if (authFlow.authProvider === 'Supabase Auth') {
+    issues.push({
+      type: 'info',
+      title: 'Row Level Security',
+      description: 'Implement Row Level Security (RLS) policies to protect your data.',
+      details: 'RLS provides an additional security layer beyond token validation',
+      learnMoreUrl: 'https://supabase.com/docs/guides/auth/row-level-security'
+    });
+  }
+  
+  if (authFlow.authProvider === 'AWS Cognito') {
+    issues.push({
+      type: 'info',
+      title: 'Token Validation',
+      description: 'Always validate JWT signatures using Cognito public keys.',
+      details: 'Verify signature, issuer, audience, and expiration claims',
+      learnMoreUrl: 'https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-verifying-a-jwt.html'
+    });
+  }
+  
+  if (authFlow.authProvider === 'NextAuth.js') {
+    issues.push({
+      type: 'info',
+      title: 'Session Security',
+      description: 'Configure secure session cookies and implement CSRF protection.',
+      details: 'NextAuth.js handles most security automatically, but review configuration',
+      learnMoreUrl: 'https://next-auth.js.org/configuration/options#session'
     });
   }
   
@@ -53,7 +107,8 @@ const getSecurityIssues = (authFlow: AuthFlow) => {
     type: 'info',
     title: 'HTTPS Required',
     description: 'Always use HTTPS in production to prevent token interception.',
-    details: 'Tokens sent over HTTP can be easily intercepted'
+    details: 'Tokens sent over HTTP can be easily intercepted',
+    learnMoreUrl: 'https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Protection_Cheat_Sheet.html'
   });
   
   return issues;
@@ -88,9 +143,15 @@ export const SecurityAnnotations: React.FC<SecurityAnnotationsProps> = ({ authFl
               </AlertDescription>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button className="text-xs text-primary hover:underline mt-2">
-                    Learn more →
-                  </button>
+                  <a
+                    href={issue.learnMoreUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-2 transition-colors"
+                  >
+                    Learn more
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
                 </TooltipTrigger>
                 <TooltipContent className="max-w-xs">
                   <p className="text-sm">{issue.details}</p>
