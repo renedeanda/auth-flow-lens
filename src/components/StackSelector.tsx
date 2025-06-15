@@ -6,7 +6,7 @@ import { Zap, Shield, Palette, Code2, TrendingUp } from 'lucide-react';
 import { AuthFlow } from '@/types/auth';
 import { frontendOptions, authProviderOptions, backendOptions } from '@/data/stackOptions';
 import { StackBadges } from './StackBadges';
-import { stackPopularity, getPopularityColor, getTrendIcon } from '@/data/stackPopularity';
+import { stackPopularity, getPopularityLabel, getPopularityColor, getTrendIcon } from '@/data/stackPopularity';
 
 interface StackSelectorProps {
   authFlow: AuthFlow;
@@ -28,7 +28,7 @@ const PopularityBadge = ({ category, value }: { category: keyof typeof stackPopu
   return (
     <div className="flex items-center gap-1 text-xs">
       <span className={getPopularityColor(popularity.popularity)}>
-        {popularity.percentage}%
+        {getPopularityLabel(popularity.popularity)}
       </span>
       <span className="text-xs">
         {getTrendIcon(popularity.trend)}
@@ -49,7 +49,7 @@ export const StackSelector: React.FC<StackSelectorProps> = ({ authFlow, setAuthF
             Choose Your Stack
             <div className="flex items-center gap-1 text-xs bg-muted/50 px-2 py-1 rounded-full">
               <TrendingUp className="w-3 h-3" />
-              <span>Usage rates</span>
+              <span>Popularity</span>
             </div>
           </div>
         </CardTitle>
