@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from 'react';
 import mermaid from 'mermaid';
 import { AuthFlow } from '@/types/auth';
@@ -12,28 +13,37 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
         startOnLoad: true,
         theme: actualTheme === 'dark' ? 'dark' : 'base',
         themeVariables: actualTheme === 'dark' ? {
-          primaryColor: '#3B82F6',
-          primaryTextColor: '#F1F5F9',
-          primaryBorderColor: '#2563EB',
-          lineColor: '#8B5CF6',
-          secondaryColor: '#1E293B',
-          tertiaryColor: '#0F172A',
-          background: '#0F172A',
-          mainBkg: '#1E293B',
-          secondBkg: '#334155',
-          // Improved text colors for better contrast
-          textColor: '#F1F5F9',
-          actorTextColor: '#F1F5F9',
-          labelTextColor: '#F1F5F9',
-          loopTextColor: '#F1F5F9',
-          activationTextColor: '#F1F5F9',
-          // Note backgrounds for better readability
-          noteBkgColor: '#FCD34D',
-          noteTextColor: '#1F2937',
-          // Actor colors
-          actorBkg: '#1E293B',
-          actorBorder: '#475569',
-          actorLineColor: '#8B5CF6'
+          primaryColor: '#60A5FA',
+          primaryTextColor: '#FFFFFF',
+          primaryBorderColor: '#3B82F6',
+          lineColor: '#A78BFA',
+          secondaryColor: '#374151',
+          tertiaryColor: '#1F2937',
+          background: '#111827',
+          mainBkg: '#374151',
+          secondBkg: '#4B5563',
+          // High contrast text colors for better readability
+          textColor: '#FFFFFF',
+          actorTextColor: '#FFFFFF',
+          labelTextColor: '#FFFFFF',
+          loopTextColor: '#FFFFFF',
+          activationTextColor: '#FFFFFF',
+          // Note styling with high contrast
+          noteBkgColor: '#FEF3C7',
+          noteTextColor: '#92400E',
+          noteLabelColor: '#92400E',
+          // Actor styling with better contrast
+          actorBkg: '#4B5563',
+          actorBorder: '#9CA3AF',
+          actorLineColor: '#A78BFA',
+          // Message text styling
+          messageLine0: '#FFFFFF',
+          messageLine1: '#FFFFFF',
+          messageText: '#FFFFFF',
+          // Arrow colors
+          arrowheadColor: '#A78BFA',
+          // Sequence diagram specific
+          sequenceNumberColor: '#FFFFFF'
         } : {
           primaryColor: '#3B82F6',
           primaryTextColor: '#1F2937',
