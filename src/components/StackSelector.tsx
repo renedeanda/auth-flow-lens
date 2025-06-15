@@ -14,7 +14,8 @@ interface StackSelectorProps {
 }
 
 const PopularityBadge = ({ category, value }: { category: keyof typeof stackPopularity, value: string }) => {
-  const popularity = stackPopularity[category][value as keyof typeof stackPopularity[typeof category]];
+  const categoryData = stackPopularity[category] as Record<string, any>;
+  const popularity = categoryData[value];
   
   if (!popularity) return null;
 
