@@ -1,4 +1,3 @@
-
 import { useEffect, useRef } from 'react';
 import mermaid from 'mermaid';
 import { AuthFlow } from '@/types/auth';
@@ -27,7 +26,6 @@ export const useDiagramGenerator = (authFlow: AuthFlow, actualTheme: 'dark' | 'l
           actorTextColor: '#F1F5F9',
           labelTextColor: '#F1F5F9',
           loopTextColor: '#F1F5F9',
-          noteTextColor: '#F1F5F9',
           activationTextColor: '#F1F5F9',
           // Note backgrounds for better readability
           noteBkgColor: '#FCD34D',
