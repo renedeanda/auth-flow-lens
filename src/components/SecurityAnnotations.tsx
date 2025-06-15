@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -11,38 +12,42 @@ interface SecurityAnnotationsProps {
 const getSecurityIssues = (authFlow: AuthFlow) => {
   const issues = [];
   
+  // Enhanced token storage guidance with more nuance
+  if (authFlow.frontend === 'React' || authFlow.frontend === 'Vue.js' || authFlow.frontend === 'Next.js') {
+    issues.push({
+      type: 'info',
+      title: 'Token Storage Strategy',
+      description: 'Storage choice depends on your threat model: httpOnly cookies (CSRF risk) vs localStorage (XSS risk) vs memory (UX impact).',
+      details: 'Consider: token size limits (cookies: 4KB, localStorage: ~5MB), domain sharing needs, mobile app support, and refresh token patterns',
+      learnMoreUrl: 'https://auth0.com/docs/secure/security-guidance/data-security/token-storage'
+    });
+  }
+  
+  // Universal short-lived token guidance with emphasis on refresh tokens
+  issues.push({
+    type: 'warning',
+    title: 'Short-lived Access Tokens + Refresh Tokens',
+    description: 'Access tokens should expire in 15-60 minutes. Use refresh tokens for longer sessions without re-authentication.',
+    details: 'Many developers use long-lived tokens for convenience, but this increases security risk significantly. Refresh tokens are crucial for both security and UX.',
+    learnMoreUrl: 'https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them/'
+  });
+  
   if (authFlow.authProvider === 'Custom JWT') {
     issues.push({
       type: 'warning',
-      title: 'JWT Security & Refresh Tokens',
-      description: 'JWTs should be short-lived (15-60 minutes) with longer-lived refresh tokens for security.',
-      details: 'Many developers skip refresh tokens, but they\'re crucial for security and user experience',
-      learnMoreUrl: 'https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them/'
-    });
-    
-    issues.push({
-      type: 'info',
-      title: 'Token Storage Trade-offs',
-      description: 'httpOnly cookies prevent XSS but are vulnerable to CSRF. localStorage prevents CSRF but vulnerable to XSS.',
-      details: 'Choice depends on your app\'s threat model: Size limits, convenience, and attack vectors differ',
-      learnMoreUrl: 'https://auth0.com/docs/secure/security-guidance/data-security/token-storage'
+      title: 'JWT Implementation Complexity',
+      description: 'Custom JWT implementations often skip refresh tokens, proper key rotation, and token blacklisting.',
+      details: 'Consider using a battle-tested auth service instead of rolling your own JWT implementation',
+      learnMoreUrl: 'https://auth0.com/blog/a-look-at-the-latest-draft-for-jwt-bcp/'
     });
   }
   
   if (authFlow.authProvider === 'Passport.js') {
     issues.push({
       type: 'warning',
-      title: 'Missing Refresh Token Implementation',
-      description: 'Many Passport.js implementations skip refresh tokens, requiring full re-authentication when sessions expire.',
-      details: 'Consider implementing refresh tokens even with session-based auth for better UX',
-      learnMoreUrl: 'https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html'
-    });
-    
-    issues.push({
-      type: 'warning',
       title: 'Session vs Token Trade-offs',
       description: 'Sessions with httpOnly cookies prevent XSS but need CSRF protection. Consider hybrid approaches.',
-      details: 'Sessions are vulnerable to CSRF, tokens to XSS - understand your threat model',
+      details: 'Sessions are vulnerable to CSRF, tokens to XSS. Many Passport.js implementations lack refresh token support.',
       learnMoreUrl: 'https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html'
     });
   }
@@ -58,32 +63,13 @@ const getSecurityIssues = (authFlow: AuthFlow) => {
     });
   }
   
-  // Enhanced token storage guidance
-  if (authFlow.frontend === 'React' || authFlow.frontend === 'Vue.js' || authFlow.frontend === 'Next.js') {
-    issues.push({
-      type: 'info',
-      title: 'Token Storage Strategy',
-      description: 'Storage choice depends on your threat model: httpOnly cookies (CSRF risk) vs localStorage (XSS risk) vs memory (UX impact).',
-      details: 'Consider: token size limits, domain sharing needs, mobile app support, and refresh token patterns',
-      learnMoreUrl: 'https://auth0.com/docs/secure/security-guidance/data-security/token-storage'
-    });
-  }
-  
-  // Universal refresh token guidance
-  issues.push({
-    type: 'warning',
-    title: 'Short-lived Access Tokens',
-    description: 'Access tokens should expire in 15-60 minutes. Use refresh tokens for longer sessions without re-authentication.',
-    details: 'Many developers use long-lived tokens for convenience, but this increases security risk significantly',
-    learnMoreUrl: 'https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them/'
-  });
-  
+  // Provider-specific guidance
   if (authFlow.authProvider === 'Auth0') {
     issues.push({
       type: 'info',
       title: 'Token Validation',
-      description: 'Always validate tokens on the backend, never trust frontend-only validation.',
-      details: 'Critical: Backend must verify token signature and expiration',
+      description: 'Always validate tokens on the backend using Auth0\'s public keys, never trust frontend-only validation.',
+      details: 'Verify JWT signature, issuer, audience, and expiration claims',
       learnMoreUrl: 'https://auth0.com/docs/secure/tokens/access-tokens/validate-access-tokens'
     });
   }
@@ -91,9 +77,9 @@ const getSecurityIssues = (authFlow: AuthFlow) => {
   if (authFlow.authProvider === 'Firebase Auth') {
     issues.push({
       type: 'info',
-      title: 'Token Validation',
-      description: 'Always validate tokens on the backend, never trust frontend-only validation.',
-      details: 'Critical: Backend must verify token signature and expiration',
+      title: 'Firebase Admin SDK Required',
+      description: 'Always validate ID tokens server-side using Firebase Admin SDK, never trust client tokens.',
+      details: 'Firebase automatically handles token refresh, but backend validation is still required',
       learnMoreUrl: 'https://firebase.google.com/docs/auth/admin/verify-id-tokens'
     });
   }
@@ -101,9 +87,9 @@ const getSecurityIssues = (authFlow: AuthFlow) => {
   if (authFlow.authProvider === 'Clerk') {
     issues.push({
       type: 'info',
-      title: 'Token Validation',
-      description: 'Always validate tokens on the backend, never trust frontend-only validation.',
-      details: 'Critical: Backend must verify token signature and expiration',
+      title: 'Server-side Validation',
+      description: 'Use Clerk\'s getAuth() helper in your backend to validate sessions, don\'t rely on frontend checks.',
+      details: 'Clerk handles token refresh automatically but server-side validation is mandatory',
       learnMoreUrl: 'https://clerk.com/docs/backend-requests/handling/manual-jwt'
     });
   }
@@ -111,140 +97,50 @@ const getSecurityIssues = (authFlow: AuthFlow) => {
   if (authFlow.authProvider === 'Supabase Auth') {
     issues.push({
       type: 'info',
-      title: 'Row Level Security',
-      description: 'Implement Row Level Security (RLS) policies to protect your data.',
-      details: 'RLS provides an additional security layer beyond token validation',
+      title: 'Row Level Security (RLS)',
+      description: 'Implement RLS policies to protect your data beyond token validation.',
+      details: 'RLS provides an additional security layer and should be enabled on all tables',
       learnMoreUrl: 'https://supabase.com/docs/guides/auth/row-level-security'
     });
   }
-  
+
   if (authFlow.authProvider === 'AWS Cognito') {
     issues.push({
       type: 'info',
-      title: 'Token Validation',
-      description: 'Always validate JWT signatures using Cognito public keys.',
-      details: 'Verify signature, issuer, audience, and expiration claims',
+      title: 'JWT Signature Verification',
+      description: 'Always validate JWT signatures using Cognito public keys and verify all claims.',
+      details: 'Verify signature, issuer, audience, and expiration. Consider MFA for sensitive operations.',
       learnMoreUrl: 'https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-verifying-a-jwt.html'
     });
   }
-  
+
   if (authFlow.authProvider === 'NextAuth.js') {
     issues.push({
       type: 'info',
-      title: 'Session Security',
-      description: 'Configure secure session cookies and implement CSRF protection.',
-      details: 'NextAuth.js handles most security automatically, but review configuration',
+      title: 'Session Security Configuration',
+      description: 'Configure secure session cookies and implement proper CSRF protection.',
+      details: 'NextAuth.js handles most security automatically, but review session configuration and token refresh settings',
       learnMoreUrl: 'https://next-auth.js.org/configuration/options#session'
     });
   }
-
-  // Add missing auth providers
-  if (authFlow.authProvider === 'Okta') {
-    issues.push({
-      type: 'info',
-      title: 'Token Validation',
-      description: 'Always validate Okta JWT tokens and implement proper scopes.',
-      details: 'Verify JWT signature using Okta public keys and validate claims',
-      learnMoreUrl: 'https://developer.okta.com/docs/guides/validate-access-tokens/go/main/'
-    });
-  }
-
-  if (authFlow.authProvider === 'Azure AD') {
-    issues.push({
-      type: 'info',
-      title: 'Token Validation',
-      description: 'Validate Azure AD tokens and implement proper API permissions.',
-      details: 'Use Microsoft Graph API securely and validate JWT signatures',
-      learnMoreUrl: 'https://docs.microsoft.com/en-us/azure/active-directory/develop/access-tokens'
-    });
-  }
-
-  if (authFlow.authProvider === 'Google Identity') {
-    issues.push({
-      type: 'info',
-      title: 'Token Validation',
-      description: 'Verify Google ID tokens and implement proper OAuth 2.0 scopes.',
-      details: 'Always validate Google JWT tokens server-side',
-      learnMoreUrl: 'https://developers.google.com/identity/protocols/oauth2/openid-connect#validatinganidtoken'
-    });
-  }
-
-  if (authFlow.authProvider === 'Magic') {
-    issues.push({
-      type: 'info',
-      title: 'Token Security',
-      description: 'Implement proper token validation and secure Magic Link handling.',
-      details: 'Magic uses cryptographic proofs - ensure proper validation',
-      learnMoreUrl: 'https://magic.link/docs/auth/api-reference/server-side-sdks/node#token-validation'
-    });
-  }
-
-  if (authFlow.authProvider === 'Stytch') {
-    issues.push({
-      type: 'info',
-      title: 'Session Security',
-      description: 'Implement proper Stytch session validation and token refresh.',
-      details: 'Use Stytch backend SDKs for secure token validation',
-      learnMoreUrl: 'https://stytch.com/docs/guides/sessions/using-sessions'
-    });
-  }
-
-  if (authFlow.authProvider === 'WorkOS') {
-    issues.push({
-      type: 'info',
-      title: 'SSO Security',
-      description: 'Implement proper SAML/OIDC validation and organization isolation.',
-      details: 'WorkOS handles enterprise SSO - ensure proper user isolation',
-      learnMoreUrl: 'https://workos.com/docs/sso/guide/introduction'
-    });
-  }
-
-  if (authFlow.authProvider === 'Keycloak') {
-    issues.push({
-      type: 'info',
-      title: 'Token Validation',
-      description: 'Configure proper realm isolation and validate Keycloak JWT tokens.',
-      details: 'Use Keycloak adapters or validate JWTs using realm public keys',
-      learnMoreUrl: 'https://www.keycloak.org/docs/latest/securing_apps/index.html#_token-verification'
-    });
-  }
-
-  if (authFlow.authProvider === 'FusionAuth') {
-    issues.push({
-      type: 'info',
-      title: 'JWT Security',
-      description: 'Implement proper FusionAuth JWT validation and refresh token handling.',
-      details: 'Use FusionAuth client libraries for secure token management',
-      learnMoreUrl: 'https://fusionauth.io/docs/v1/tech/apis/jwt#verify-a-jwt'
-    });
-  }
-  
-  // Universal security reminders
-  issues.push({
-    type: 'info',
-    title: 'HTTPS Required',
-    description: 'Always use HTTPS in production to prevent token interception.',
-    details: 'Tokens sent over HTTP can be easily intercepted',
-    learnMoreUrl: 'https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Protection_Cheat_Sheet.html'
-  });
 
   // Add CSRF protection reminder for session-based auth
   if (authFlow.authProvider === 'Passport.js' || authFlow.authProvider === 'NextAuth.js') {
     issues.push({
       type: 'warning',
-      title: 'CSRF Protection',
+      title: 'CSRF Protection Required',
       description: 'Implement CSRF tokens to prevent cross-site request forgery attacks.',
-      details: 'Session-based auth is vulnerable to CSRF - use proper tokens',
+      details: 'Session-based auth with cookies is vulnerable to CSRF - use proper CSRF tokens or SameSite cookies',
       learnMoreUrl: 'https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html'
     });
   }
 
-  // Add rate limiting reminder
+  // Universal security reminders
   issues.push({
     type: 'info',
-    title: 'Rate Limiting',
-    description: 'Implement rate limiting on authentication endpoints to prevent brute force attacks.',
-    details: 'Protect login endpoints with exponential backoff and account lockout',
+    title: 'HTTPS & Rate Limiting',
+    description: 'Always use HTTPS in production and implement rate limiting on auth endpoints.',
+    details: 'Protect against brute force attacks with exponential backoff and account lockout mechanisms',
     learnMoreUrl: 'https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html#account-lockout'
   });
   
@@ -269,11 +165,11 @@ export const SecurityAnnotations: React.FC<SecurityAnnotationsProps> = ({ authFl
         >
           <div className="flex items-start gap-3">
             {issue.type === 'warning' ? (
-              <AlertTriangle className="w-5 h-5 text-orange-500 mt-0.5" />
+              <AlertTriangle className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
             ) : (
-              <Info className="w-5 h-5 text-blue-500 mt-0.5" />
+              <Info className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
             )}
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <AlertTitle className="text-sm font-semibold">{issue.title}</AlertTitle>
               <AlertDescription className="text-sm text-muted-foreground mt-1">
                 {issue.description}
