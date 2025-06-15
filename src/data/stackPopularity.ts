@@ -1,4 +1,3 @@
-
 export const stackPopularity = {
   frontend: {
     'Next.js': { popularity: 'very-high', trend: 'rising', description: 'Full-stack React framework with SSR' },
@@ -9,7 +8,7 @@ export const stackPopularity = {
     'Nuxt.js': { popularity: 'medium', trend: 'rising', description: 'Vue.js meta-framework' },
     'Remix': { popularity: 'medium', trend: 'rising', description: 'Full-stack web framework focused on web standards' },
     'SolidJS': { popularity: 'low', trend: 'rising', description: 'Fine-grained reactive framework' },
-    'HTML/JavaScript': { popularity: 'low', trend: 'declining', description: 'Vanilla web technologies' },
+    'HTML/JavaScript': { popularity: 'very-high', trend: 'stable', description: 'The foundational web technologies' },
     'React Native': { popularity: 'high', trend: 'stable', description: 'Cross-platform mobile development' },
     'Flutter Web': { popularity: 'low', trend: 'rising', description: 'Google\'s UI toolkit for web' }
   },
