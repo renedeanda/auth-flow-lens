@@ -20,7 +20,6 @@ const Index = () => {
     authProvider: 'Auth0',
     backend: 'Next.js API Routes'
   });
-  const [diagramId, setDiagramId] = useState('auth-diagram');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -34,6 +33,10 @@ const Index = () => {
         lineColor: '#6366F1',
         secondaryColor: '#EFF6FF',
         tertiaryColor: '#F8FAFC'
+      },
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true
       }
     });
   }, []);
@@ -41,7 +44,6 @@ const Index = () => {
   const generateMermaidDiagram = (flow: AuthFlow): string => {
     const { frontend, authProvider, backend } = flow;
     
-    // Different flow templates based on selected stack
     if (authProvider === 'Auth0') {
       return `
         sequenceDiagram
@@ -65,7 +67,7 @@ const Index = () => {
           A->>B: Token valid ✅
           B->>F: Return protected data
       `;
-    } else if (authProvider === 'Firebase') {
+    } else if (authProvider === 'Firebase Auth') {
       return `
         sequenceDiagram
           participant U as 👤 User
@@ -74,15 +76,15 @@ const Index = () => {
           participant B as ⚡ ${backend}
           
           U->>F: Click "Sign In"
-          F->>FB: Firebase signIn()
-          FB->>U: Show auth popup
+          F->>FB: Firebase signInWithEmailAndPassword()
+          FB->>U: Show auth popup/form
           U->>FB: Complete authentication
           FB->>F: Return user + ID token
           F->>F: Store token automatically
           
           Note over F: User makes API request
           F->>B: API call with Firebase token
-          B->>FB: Verify token
+          B->>FB: Verify token with Firebase Admin
           FB->>B: Token valid ✅
           B->>F: Return protected data
       `;
@@ -95,7 +97,7 @@ const Index = () => {
           participant B as ⚡ ${backend}
           
           U->>F: Access protected page
-          F->>C: Check auth status
+          F->>C: Check auth status with useAuth()
           C->>F: Not authenticated
           F->>C: Show SignIn component
           U->>C: Complete sign in
@@ -103,12 +105,12 @@ const Index = () => {
           F->>F: Redirect to app
           
           Note over F: User makes API request
-          F->>B: API call with session
-          B->>C: Validate session
+          F->>B: API call with session cookie
+          B->>C: Validate session with Clerk
           C->>B: Session valid ✅
           B->>F: Return protected data
       `;
-    } else if (authProvider === 'Supabase') {
+    } else if (authProvider === 'Supabase Auth') {
       return `
         sequenceDiagram
           participant U as 👤 User
@@ -117,64 +119,158 @@ const Index = () => {
           participant B as ⚡ ${backend}
           
           U->>F: Click "Sign In"
-          F->>S: supabase.auth.signIn()
-          S->>U: Send magic link/show form
+          F->>S: supabase.auth.signInWithPassword()
+          S->>U: Send magic link or show form
           U->>S: Complete authentication
           S->>F: Return session + JWT
           F->>F: Auto-store in localStorage
           
           Note over F: User makes API request
-          F->>S: API call (auto-headers)
+          F->>S: API call (auto JWT headers)
           S->>S: Validate JWT internally
-          S->>F: Return data ✅
+          S->>F: Return data with RLS ✅
+      `;
+    } else if (authProvider === 'AWS Cognito') {
+      return `
+        sequenceDiagram
+          participant U as 👤 User
+          participant F as 🖥️ ${frontend}
+          participant C as ☁️ AWS Cognito
+          participant B as ⚡ ${backend}
+          
+          U->>F: Submit login form
+          F->>C: AWS.CognitoIdentityServiceProvider.initiateAuth()
+          C->>U: Challenge (MFA if enabled)
+          U->>C: Complete authentication
+          C->>F: Return ID/Access/Refresh tokens
+          F->>F: Store tokens securely
+          
+          Note over F: User makes API request
+          F->>B: API call with Bearer token
+          B->>C: Validate JWT signature
+          C->>B: Token valid ✅
+          B->>F: Return protected data
+      `;
+    } else if (authProvider === 'NextAuth.js') {
+      return `
+        sequenceDiagram
+          participant U as 👤 User
+          participant F as 🖥️ ${frontend}
+          participant N as 🔑 NextAuth.js
+          participant P as 🌐 OAuth Provider
+          participant B as ⚡ ${backend}
+          
+          U->>F: Click "Sign In"
+          F->>N: signIn() function
+          N->>P: Redirect to OAuth provider
+          P->>U: Show OAuth consent
+          U->>P: Grant permission
+          P->>N: Return with authorization code
+          N->>F: Set session cookie
+          
+          Note over F: User makes API request
+          F->>B: API call with session cookie
+          B->>N: Validate session
+          N->>B: Session valid ✅
+          B->>F: Return protected data
+      `;
+    } else if (authProvider === 'Passport.js') {
+      return `
+        sequenceDiagram
+          participant U as 👤 User
+          participant F as 🖥️ ${frontend}
+          participant P as 🛂 Passport.js
+          participant B as ⚡ ${backend}
+          
+          U->>F: Submit login form
+          F->>B: POST /auth/login
+          B->>P: passport.authenticate()
+          P->>P: Verify credentials
+          P->>B: Authentication result
+          B->>B: Create session
+          B->>F: Set session cookie
+          
+          Note over F: User makes API request
+          F->>B: API call with session cookie
+          B->>P: deserializeUser()
+          P->>B: User data ✅
+          B->>F: Return protected data
+      `;
+    } else if (authProvider === 'Custom JWT') {
+      return `
+        sequenceDiagram
+          participant U as 👤 User
+          participant F as 🖥️ ${frontend}
+          participant B as ⚡ ${backend}
+          
+          U->>F: Submit login form
+          F->>B: POST /auth/login
+          B->>B: Verify credentials
+          B->>B: Generate JWT with secret
+          B->>F: Return JWT token
+          F->>F: Store JWT (localStorage/cookie)
+          
+          Note over F: User makes API request
+          F->>B: API call with Authorization: Bearer JWT
+          B->>B: Verify JWT signature
+          B->>B: Check token expiry
+          B->>F: Return protected data ✅
       `;
     } else {
       return `
         sequenceDiagram
           participant U as 👤 User
           participant F as 🖥️ ${frontend}
-          participant A as 🔑 Custom Auth
+          participant A as 🔑 ${authProvider}
           participant B as ⚡ ${backend}
           
-          U->>F: Submit login form
-          F->>B: POST /auth/login
-          B->>B: Verify credentials
-          B->>B: Generate JWT
-          B->>F: Return JWT token
-          F->>F: Store JWT (localStorage)
+          U->>F: Initiate authentication
+          F->>A: Authentication request
+          A->>U: Show auth interface
+          U->>A: Provide credentials
+          A->>F: Return authentication result
+          F->>F: Store auth state
           
           Note over F: User makes API request
-          F->>B: API call with Authorization header
-          B->>B: Verify JWT signature
-          B->>F: Return protected data ✅
+          F->>B: API call with auth headers
+          B->>A: Validate credentials
+          A->>B: Validation result ✅
+          B->>F: Return protected data
       `;
     }
   };
 
   const renderDiagram = async () => {
     const diagramDefinition = generateMermaidDiagram(authFlow);
-    const newId = `auth-diagram-${Date.now()}`;
-    setDiagramId(newId);
     
-    // Clear previous diagram
-    const element = document.getElementById('diagram-container');
-    if (element) {
-      element.innerHTML = `<div id="${newId}"></div>`;
-      
-      try {
-        await mermaid.render(newId, diagramDefinition);
-        const diagramDiv = document.getElementById(newId);
-        if (diagramDiv) {
-          element.innerHTML = diagramDiv.innerHTML;
-        }
-      } catch (error) {
-        console.error('Mermaid rendering error:', error);
+    try {
+      const element = document.getElementById('diagram-container');
+      if (element) {
+        // Clear previous content
+        element.innerHTML = '';
+        
+        // Create a unique ID for this render
+        const diagramId = `diagram-${Date.now()}`;
+        
+        // Render the diagram
+        const { svg } = await mermaid.render(diagramId, diagramDefinition);
+        element.innerHTML = svg;
+      }
+    } catch (error) {
+      console.error('Mermaid rendering error:', error);
+      const element = document.getElementById('diagram-container');
+      if (element) {
+        element.innerHTML = '<div class="flex items-center justify-center h-64 text-gray-500">Error rendering diagram. Please try a different configuration.</div>';
       }
     }
   };
 
   useEffect(() => {
-    renderDiagram();
+    const timer = setTimeout(() => {
+      renderDiagram();
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, [authFlow]);
 
   const copyDiagramCode = () => {
@@ -262,7 +358,14 @@ const Index = () => {
                       <SelectItem value="Next.js">Next.js</SelectItem>
                       <SelectItem value="React">React</SelectItem>
                       <SelectItem value="Vue.js">Vue.js</SelectItem>
-                      <SelectItem value="HTML/JS">HTML/JS</SelectItem>
+                      <SelectItem value="Angular">Angular</SelectItem>
+                      <SelectItem value="Svelte">Svelte</SelectItem>
+                      <SelectItem value="Nuxt.js">Nuxt.js</SelectItem>
+                      <SelectItem value="Remix">Remix</SelectItem>
+                      <SelectItem value="SolidJS">SolidJS</SelectItem>
+                      <SelectItem value="HTML/JavaScript">HTML/JavaScript</SelectItem>
+                      <SelectItem value="React Native">React Native</SelectItem>
+                      <SelectItem value="Flutter Web">Flutter Web</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -280,10 +383,21 @@ const Index = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Auth0">Auth0</SelectItem>
-                      <SelectItem value="Firebase">Firebase Auth</SelectItem>
+                      <SelectItem value="Firebase Auth">Firebase Auth</SelectItem>
                       <SelectItem value="Clerk">Clerk</SelectItem>
-                      <SelectItem value="Supabase">Supabase Auth</SelectItem>
+                      <SelectItem value="Supabase Auth">Supabase Auth</SelectItem>
+                      <SelectItem value="AWS Cognito">AWS Cognito</SelectItem>
+                      <SelectItem value="NextAuth.js">NextAuth.js</SelectItem>
+                      <SelectItem value="Passport.js">Passport.js</SelectItem>
                       <SelectItem value="Custom JWT">Custom JWT</SelectItem>
+                      <SelectItem value="Okta">Okta</SelectItem>
+                      <SelectItem value="Azure AD">Azure AD</SelectItem>
+                      <SelectItem value="Google Identity">Google Identity</SelectItem>
+                      <SelectItem value="Magic">Magic</SelectItem>
+                      <SelectItem value="Stytch">Stytch</SelectItem>
+                      <SelectItem value="WorkOS">WorkOS</SelectItem>
+                      <SelectItem value="Keycloak">Keycloak</SelectItem>
+                      <SelectItem value="FusionAuth">FusionAuth</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -300,10 +414,25 @@ const Index = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="None">None (Client-only)</SelectItem>
+                      <SelectItem value="None (Client-only)">None (Client-only)</SelectItem>
                       <SelectItem value="Next.js API Routes">Next.js API Routes</SelectItem>
                       <SelectItem value="Express.js">Express.js</SelectItem>
-                      <SelectItem value="Serverless">Serverless Functions</SelectItem>
+                      <SelectItem value="Node.js">Node.js</SelectItem>
+                      <SelectItem value="Fastify">Fastify</SelectItem>
+                      <SelectItem value="NestJS">NestJS</SelectItem>
+                      <SelectItem value="Django">Django</SelectItem>
+                      <SelectItem value="Flask">Flask</SelectItem>
+                      <SelectItem value="FastAPI">FastAPI</SelectItem>
+                      <SelectItem value="Ruby on Rails">Ruby on Rails</SelectItem>
+                      <SelectItem value="Spring Boot">Spring Boot</SelectItem>
+                      <SelectItem value="ASP.NET Core">ASP.NET Core</SelectItem>
+                      <SelectItem value="Go Gin">Go Gin</SelectItem>
+                      <SelectItem value="Rust Actix">Rust Actix</SelectItem>
+                      <SelectItem value="Serverless Functions">Serverless Functions</SelectItem>
+                      <SelectItem value="AWS Lambda">AWS Lambda</SelectItem>
+                      <SelectItem value="Vercel Functions">Vercel Functions</SelectItem>
+                      <SelectItem value="Netlify Functions">Netlify Functions</SelectItem>
+                      <SelectItem value="Cloudflare Workers">Cloudflare Workers</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -361,9 +490,10 @@ const Index = () => {
               <CardContent>
                 <div 
                   id="diagram-container"
-                  className="w-full min-h-[400px] bg-white rounded-lg border border-slate-200 p-6 overflow-auto"
-                  style={{ fontSize: '14px' }}
-                />
+                  className="w-full min-h-[500px] bg-white rounded-lg border border-slate-200 p-6 overflow-auto flex items-center justify-center"
+                >
+                  <div className="text-slate-500">Loading diagram...</div>
+                </div>
               </CardContent>
             </Card>
           </div>
