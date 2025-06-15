@@ -29,7 +29,7 @@ export const DiagramDisplay: React.FC<DiagramDisplayProps> = ({ authFlow }) => {
         <CardContent>
           <div 
             id="diagram-container"
-            className="w-full min-h-[500px] bg-background/50 backdrop-blur-sm rounded-xl border border-border/50 p-6 overflow-auto flex items-center justify-center shadow-inner"
+            className="w-full min-h-[500px] bg-white rounded-xl border border-border/50 p-6 overflow-auto flex items-center justify-center shadow-inner"
           >
             <div className="text-muted-foreground animate-pulse">Loading diagram...</div>
           </div>
