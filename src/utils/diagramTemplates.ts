@@ -10,6 +10,7 @@ export const generateMermaidDiagram = (flow: AuthFlow): string => {
         participant U as 👤 User
         participant F as 🖥️ ${frontend}
         participant A as 🔐 Auth0
+        participant P as 🌐 OAuth Provider
         participant B as ⚡ ${backend}
         
         Note over U,B: 🔄 OAuth 2.0 + PKCE Flow (with 3rd party)
@@ -19,11 +20,11 @@ export const generateMermaidDiagram = (flow: AuthFlow): string => {
         F->>A: Redirect to /authorize (code_challenge + state)
         A->>U: Show Auth0 Universal Login
         U->>A: Enter credentials or select OAuth provider
-        alt OAuth Provider (Google, GitHub, etc.)
-            A->>+third: Redirect to OAuth provider
-            third->>U: Show provider consent screen
-            U->>third: Grant permission
-            third->>-A: Return with authorization code
+        alt OAuth Provider Flow (Google, GitHub, etc.)
+            A->>+P: Redirect to OAuth provider
+            P->>U: Show provider consent screen
+            U->>P: Grant permission
+            P->>-A: Return with authorization code
             A->>A: Exchange code for provider tokens
         end
         A->>A: Validate credentials/tokens
@@ -91,22 +92,22 @@ export const generateMermaidDiagram = (flow: AuthFlow): string => {
         participant U as 👤 User
         participant F as 🖥️ ${frontend}
         participant N as 🔑 NextAuth.js
-        participant P as 🌐 OAuth Provider
+        participant O as 🌐 OAuth Provider
         participant B as ⚡ ${backend}
         
         Note over U,B: 🔄 NextAuth.js OAuth Flow (3rd party involved)
         U->>F: Click "Sign in with Provider"
         F->>N: signIn("provider") function call
         N->>N: Generate PKCE code_challenge + state + nonce
-        N->>P: Redirect to OAuth provider authorization URL
-        Note over N,P: 🔒 HTTPS + PKCE + state + nonce for security
-        P->>U: Show OAuth consent screen (Google, GitHub, etc.)
-        U->>P: Grant permission
-        P->>N: Redirect with authorization code + state
-        Note over P,N: ⚠️ NextAuth validates state parameter automatically
-        N->>P: Exchange code for tokens (+ code_verifier)
-        P->>N: Return access_token + id_token + refresh_token
-        Note over P,N: 🔄 Provider tokens may include refresh capability
+        N->>O: Redirect to OAuth provider authorization URL
+        Note over N,O: 🔒 HTTPS + PKCE + state + nonce for security
+        O->>U: Show OAuth consent screen (Google, GitHub, etc.)
+        U->>O: Grant permission
+        O->>N: Redirect with authorization code + state
+        Note over O,N: ⚠️ NextAuth validates state parameter automatically
+        N->>O: Exchange code for tokens (+ code_verifier)
+        O->>N: Return access_token + id_token + refresh_token
+        Note over O,N: 🔄 Provider tokens may include refresh capability
         N->>N: Create NextAuth session + handle token refresh
         N->>F: Set session cookie (next-auth.session-token)
         Note over N,F: 🛡️ httpOnly + secure + sameSite cookies (CSRF resistant)
@@ -119,8 +120,8 @@ export const generateMermaidDiagram = (flow: AuthFlow): string => {
         B->>F: Return protected data
         
         alt Token Refresh (Provider Dependent)
-            N->>P: Use refresh_token to get new access_token
-            P->>N: Return refreshed tokens
+            N->>O: Use refresh_token to get new access_token
+            O->>N: Return refreshed tokens
             N->>N: Update session with new tokens
             Note over N: 🔄 NextAuth handles refresh automatically when possible
         end
@@ -131,16 +132,17 @@ export const generateMermaidDiagram = (flow: AuthFlow): string => {
         participant U as 👤 User
         participant F as 🖥️ ${frontend}
         participant FB as 🔥 Firebase Auth
+        participant O as 🌐 OAuth Provider
         participant B as ⚡ ${backend}
         
         U->>F: Click "Sign In"
         F->>FB: signInWithEmailAndPassword() or OAuth provider
         Note over F,FB: 🔒 Firebase handles HTTPS + OAuth flows automatically
         alt OAuth Provider Flow
-            FB->>+third: Redirect to OAuth provider
-            third->>U: Show provider consent
-            U->>third: Grant permission
-            third->>-FB: Return OAuth tokens
+            FB->>+O: Redirect to OAuth provider (Google, GitHub, etc.)
+            O->>U: Show provider consent
+            U->>O: Grant permission
+            O->>-FB: Return OAuth tokens
         end
         FB->>FB: Validate credentials/OAuth tokens
         FB->>F: Return UserCredential object
@@ -164,6 +166,7 @@ export const generateMermaidDiagram = (flow: AuthFlow): string => {
         participant U as 👤 User
         participant F as 🖥️ ${frontend}
         participant C as 🛡️ Clerk
+        participant O as 🌐 OAuth Provider
         participant B as ⚡ ${backend}
         
         U->>F: Access protected route
@@ -172,10 +175,10 @@ export const generateMermaidDiagram = (flow: AuthFlow): string => {
         F->>F: Show <SignIn /> component
         Note over F,C: 🔒 Clerk handles OAuth flows + security headers
         alt OAuth Provider
-            C->>+third: Handle OAuth flow with provider
-            third->>U: Show provider consent
-            U->>third: Grant permission
-            third->>-C: Return OAuth data
+            C->>+O: Handle OAuth flow with provider (Google, GitHub, etc.)
+            O->>U: Show provider consent
+            U->>O: Grant permission
+            O->>-C: Return OAuth data
         end
         U->>C: Complete sign in via Clerk UI
         C->>C: Validate credentials/OAuth data
@@ -198,16 +201,17 @@ export const generateMermaidDiagram = (flow: AuthFlow): string => {
         participant U as 👤 User
         participant F as 🖥️ ${frontend}
         participant S as 🟢 Supabase
+        participant O as 🌐 OAuth Provider
         participant B as ⚡ ${backend}
         
         U->>F: Click "Sign In"
         F->>S: supabase.auth.signInWithPassword() or OAuth
         Note over F,S: 🔒 All requests go through HTTPS
         alt OAuth Provider Flow
-            S->>+third: Handle OAuth with provider (Google, GitHub, etc.)
-            third->>U: Show provider consent
-            U->>third: Grant permission
-            third->>-S: Return OAuth tokens
+            S->>+O: Handle OAuth with provider (Google, GitHub, etc.)
+            O->>U: Show provider consent
+            U->>O: Grant permission
+            O->>-S: Return OAuth tokens
         end
         S->>S: Validate credentials/OAuth tokens in auth.users table
         S->>F: Return {data: {user, session}, error}
@@ -237,16 +241,17 @@ export const generateMermaidDiagram = (flow: AuthFlow): string => {
         participant U as 👤 User
         participant F as 🖥️ ${frontend}
         participant C as ☁️ AWS Cognito
+        participant O as 🌐 OAuth Provider
         participant B as ⚡ ${backend}
         
         U->>F: Submit login form
         F->>C: initiateAuth() with username/password or OAuth
         Note over F,C: 🔒 SRP (Secure Remote Password) protocol used
         alt OAuth Provider Flow
-            C->>+third: Federated identity with OAuth provider
-            third->>U: Show provider consent
-            U->>third: Grant permission
-            third->>-C: Return OAuth tokens
+            C->>+O: Federated identity with OAuth provider (Google, Facebook, etc.)
+            O->>U: Show provider consent
+            U->>O: Grant permission
+            O->>-C: Return OAuth tokens
         end
         C->>F: Return AuthenticationResult or ChallengeName
         Note over C,F: 🛡️ May require MFA challenge
@@ -280,16 +285,17 @@ export const generateMermaidDiagram = (flow: AuthFlow): string => {
         participant U as 👤 User
         participant F as 🖥️ ${frontend}
         participant P as 🛂 Passport.js
+        participant O as 🌐 OAuth Provider
         participant B as ⚡ ${backend}
         
         U->>F: Submit login form or OAuth
         F->>B: POST /login with credentials + CSRF token
         Note over F,B: 🔒 HTTPS + CSRF protection essential
         alt OAuth Strategy
-            B->>+third: passport.authenticate("oauth-provider")
-            third->>U: Show OAuth consent
-            U->>third: Grant permission
-            third->>-B: Return OAuth profile + tokens
+            B->>+O: passport.authenticate("oauth-provider") (Google, GitHub, etc.)
+            O->>U: Show OAuth consent
+            U->>O: Grant permission
+            O->>-B: Return OAuth profile + tokens
             B->>P: OAuth strategy verify callback
         else Local Strategy
             B->>P: passport.authenticate("local") middleware
@@ -359,16 +365,17 @@ export const generateMermaidDiagram = (flow: AuthFlow): string => {
         participant U as 👤 User
         participant F as 🖥️ ${frontend}
         participant A as 🔑 ${authProvider}
+        participant O as 🌐 OAuth Provider
         participant B as ⚡ ${backend}
         
         U->>F: Initiate authentication
         F->>A: Authentication request
         Note over F,A: 🔒 Ensure HTTPS is used
         alt OAuth Flow (if applicable)
-            A->>+third: Redirect to OAuth provider
-            third->>U: Show consent screen
-            U->>third: Grant permission
-            third->>-A: Return authorization code/tokens
+            A->>+O: Redirect to OAuth provider (Google, GitHub, etc.)
+            O->>U: Show consent screen
+            U->>O: Grant permission
+            O->>-A: Return authorization code/tokens
         end
         A->>U: Show authentication interface
         U->>A: Provide credentials
