@@ -99,10 +99,15 @@ const Index = () => {
                   <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
                   <span className="text-xs">Always free</span>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1 bg-muted/30 rounded-full">
+                <a
+                  href="https://github.com/renedeanda/auth-flow-lens"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-1 bg-muted/30 rounded-full hover:bg-muted/50 transition-colors cursor-pointer"
+                >
                   <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
                   <span className="text-xs">Open source</span>
-                </div>
+                </a>
               </div>
             </div>
           </div>
