@@ -1,20 +1,24 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Sparkles, Zap, Shield, Heart } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useTheme } from '@/components/ThemeProvider';
 import { useDiagramGenerator } from '@/hooks/useDiagramGenerator';
+import { useUrlState } from '@/hooks/useUrlState';
 import { StackSelector } from '@/components/StackSelector';
 import { DiagramDisplay } from '@/components/DiagramDisplay';
 import { SEOHead } from '@/components/SEOHead';
+import { GoogleAnalytics } from '@/components/GoogleAnalytics';
 import { AuthFlow } from '@/types/auth';
 
 const Index = () => {
-  const [authFlow, setAuthFlow] = useState<AuthFlow>({
+  const initialAuthFlow: AuthFlow = {
     frontend: 'Next.js',
     authProvider: 'Auth0',
     backend: 'Next.js API Routes'
-  });
+  };
+
+  const { authFlow, setAuthFlow } = useUrlState(initialAuthFlow);
   const { actualTheme } = useTheme();
 
   useDiagramGenerator(authFlow, actualTheme);
@@ -22,6 +26,7 @@ const Index = () => {
   return (
     <>
       <SEOHead />
+      <GoogleAnalytics />
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 transition-colors duration-300">
         {/* Animated Background */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -88,7 +93,6 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="relative bg-background/80 backdrop-blur-sm border-t border-border/50 mt-12 sm:mt-16">
           <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
             <div className="text-center text-muted-foreground space-y-3 sm:space-y-2">
