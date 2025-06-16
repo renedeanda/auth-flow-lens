@@ -34,29 +34,42 @@ export const DiagramControls: React.FC<DiagramControlsProps> = ({ authFlow }) =>
         return;
       }
 
-      // Get SVG dimensions
+      // Get SVG dimensions and device pixel ratio for high-resolution rendering
       const svgRect = svg.getBoundingClientRect();
+      const pixelRatio = window.devicePixelRatio || 1;
+      const scale = Math.max(pixelRatio, 2); // Ensure at least 2x scaling for crisp images
+      
       const svgData = new XMLSerializer().serializeToString(svg);
       
-      // Create canvas with proper dimensions
+      // Create high-resolution canvas
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const img = new Image();
       
-      // Set canvas size to match SVG
-      canvas.width = svgRect.width || 800;
-      canvas.height = svgRect.height || 600;
+      // Set canvas size with high-resolution scaling
+      const width = svgRect.width || 800;
+      const height = svgRect.height || 600;
+      
+      canvas.width = width * scale;
+      canvas.height = height * scale;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
       
       img.onload = () => {
-        // Fill background with white
         if (ctx) {
+          // Scale the context for high-resolution rendering
+          ctx.scale(scale, scale);
+          
+          // Fill background with white
           ctx.fillStyle = 'white';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillRect(0, 0, width, height);
           
-          // Draw the SVG
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          // Draw the SVG with high quality
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, 0, width, height);
           
-          // Convert to PNG and download
+          // Convert to PNG with high quality
           canvas.toBlob((blob) => {
             if (blob) {
               const url = URL.createObjectURL(blob);
@@ -71,7 +84,7 @@ export const DiagramControls: React.FC<DiagramControlsProps> = ({ authFlow }) =>
                 description: "Your auth flow diagram has been downloaded.",
               });
             }
-          }, 'image/png');
+          }, 'image/png', 1.0); // Maximum quality
         }
       };
       
@@ -83,7 +96,7 @@ export const DiagramControls: React.FC<DiagramControlsProps> = ({ authFlow }) =>
         });
       };
       
-      // Create blob URL for SVG
+      // Create blob URL for SVG with proper encoding
       const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
       const svgUrl = URL.createObjectURL(svgBlob);
       img.src = svgUrl;
